@@ -14,17 +14,17 @@ namespace TsiryulnyaBot.BLL
     {
         private readonly ITelegramBotClient _botClient;
 
-        private readonly IConfiguration _configuration;
+        private readonly string _connectionString;
 
-        public TelegramBotController(ITelegramBotClient botClient, IConfigurationRoot configuration)
+        public TelegramBotController(ITelegramBotClient botClient, string connectionString)
         {
             _botClient = botClient;
-            _configuration = configuration;
+            _connectionString = connectionString;
         }
 
         public async Task Execute(Update update, CancellationToken cancellationToken)
         {
-            await using (var context = new TsiryulnyaContext(_configuration["ConnectionString"]))
+            await using (var context = new TsiryulnyaContext(_connectionString))
             {
                 var clientRepository = new Repository<Client>(context);
                 var recordClientRepository = new Repository<RecordClient>(context);
@@ -107,22 +107,9 @@ namespace TsiryulnyaBot.BLL
                     await Execute(update, cancellationToken);
                 };
 
-                //return;
-
-                #region test async
-                // await _botClient.SendTextMessageAsync(
-                //    chatId: update.Message!.Chat.Id,
-                //    text: "Hello",
-                //    cancellationToken: cancellationToken
-                //);
-
-                //await Task.Delay(10000);
-                #endregion
-
                 var stepPosition = (int)recordFillingStepService.Get(recordClient).StepPosition;
 
                 await scenes[stepPosition].Execute(_botClient, update, cancellationToken);
-
             }
         }
     }

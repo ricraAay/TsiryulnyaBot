@@ -1,8 +1,8 @@
 ﻿using Telegram.Bot;
-using Microsoft.Extensions.Configuration;
 using Telegram.Bot.Types;
 using Telegram.Bot.Exceptions;
 using TsiryulnyaBot.BLL;
+using TsiryulnyaBot.Static;
 
 namespace TsiryulnyaBot
 {
@@ -10,26 +10,21 @@ namespace TsiryulnyaBot
     {
         async static Task Main(string[] args)
         {
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile($"appsettings.json", true, true);
-
-            var configuration = builder.Build();
-
-            var botClient = new TelegramBotClient(configuration["BotToken"]);
+            var botClient = new TelegramBotClient(Configuration.Get("BotToken"));
 
             var botInfo = await botClient.GetMeAsync();
 
-            Console.WriteLine($"Hello, World! I am user {botInfo.Id} and my name is {botInfo.FirstName}.");
+            Console.WriteLine($"Start bot\nID: {botInfo.Id}\nNAME: {botInfo.FirstName}.");
 
-            using CancellationTokenSource cts = new();
 
             var commands = new List<BotCommand>()
             {
-                new BotCommand { Command = "/start", Description = "запустить бота" },
-                new BotCommand { Command = "/about", Description = "как работать с ботом" },
+                new BotCommand { Command = "/start", Description = "запустить/перезапустить бота" }
             };
 
-            await botClient.SetMyCommandsAsync(commands: commands);
+            await botClient.SetMyCommandsAsync(commands);
+
+            using CancellationTokenSource cts = new();
 
             botClient.StartReceiving(
                 updateHandler: HandleUpdateAsync,
@@ -42,25 +37,15 @@ namespace TsiryulnyaBot
             cts.Cancel();
         }
 
-        static public Dictionary<string, object> Coockie = new Dictionary<string, object>();
-
-        static public void Session(Update update)
-        {
-            // поиск
-        }
-
         static public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            //Console.WriteLine(JsonConvert.SerializeObject(update));
 
             Console.WriteLine($"update.type: {update.Type}");
 
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile($"appsettings.json", true, true);
-
-            var configuration = builder.Build();
-
-            var controller = new TelegramBotController(botClient, configuration);
+            var controller = new TelegramBotController(
+                botClient: botClient,
+                connectionString: Configuration.Get("ConnectionString")
+            );
 
             await Task.Run(async () => await controller.Execute(update, cancellationToken));
         }
@@ -71,10 +56,11 @@ namespace TsiryulnyaBot
             {
                 ApiRequestException apiRequestException
                     => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-                _ => exception.ToString()
+                  _ => exception.ToString()
             };
 
             Console.WriteLine(ErrorMessage);
+
             return Task.CompletedTask;
         }
     }

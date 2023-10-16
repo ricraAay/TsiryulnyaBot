@@ -1,5 +1,4 @@
 ﻿using TsiryulnyaBot.BLL.Constant;
-using TsiryulnyaBot.BLL.Interface;
 using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
 
@@ -16,9 +15,9 @@ namespace TsiryulnyaBot.BLL.Service
 
         public RecordClient Get(Client client)
         {
-            var recordClient = _recordClientRepository
-                .Get(record => record.ClientId == client!.Id)
-                .Where(record => record.StatusId == RecordStatusConstant.ProcessRegistration)
+            var recordClient = _recordClientRepository.Aggregate(
+                    item => item.ClientId == client!.Id, 
+                    item => item.StatusId == RecordStatusConstant.ProcessRegistration)
                 .FirstOrDefault();
 
             if (recordClient != null)
@@ -35,7 +34,7 @@ namespace TsiryulnyaBot.BLL.Service
             _recordClientRepository.Add(recordClient);
             _recordClientRepository.Commit();
 
-            return recordClient!;
+            return recordClient;
         }
 
         public void Update(RecordClient recordClient)

@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TsiryulnyaBot.UIL.Keyboard
+namespace TsiryulnyaBot.Static.Keyboard
 {
     public static class SingleInlineKeyboardButton
     {

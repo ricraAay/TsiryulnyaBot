@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using TsiryulnyaBot.DAL.Model;
 
-namespace TsiryulnyaBot.UIL.Keyboard
+namespace TsiryulnyaBot.Static.Keyboard
 {
     public static class TimePickerKeyboardButton
     {

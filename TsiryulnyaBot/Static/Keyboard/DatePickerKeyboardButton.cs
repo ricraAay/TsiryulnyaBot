@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using Telegram.Bot.Types.ReplyMarkups;
-using TsiryulnyaBot.UIL.Utils;
+using TsiryulnyaBot.Static.Keyboard.Utilities;
 
-namespace TsiryulnyaBot.UIL.Keyboard
+namespace TsiryulnyaBot.Static.Keyboard
 {
     public static class DatePickerKeyboardButton
     {

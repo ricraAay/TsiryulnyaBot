@@ -1,5 +1,4 @@
-﻿using Telegram.Bot.Types;
-using TsiryulnyaBot.DAL.Interface;
+﻿using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
 
 namespace TsiryulnyaBot.BLL.Service

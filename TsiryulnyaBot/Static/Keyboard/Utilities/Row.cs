@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TsiryulnyaBot.UIL.Utils
+namespace TsiryulnyaBot.Static.Keyboard.Utilities
 {
     public static class Row
     {
@@ -9,10 +9,7 @@ namespace TsiryulnyaBot.UIL.Utils
         {
             return new InlineKeyboardButton[]
             {
-                InlineKeyboardButton.WithCallbackData(
-                    $"{date.ToString("Y", dtfi)}",
-                    $"{Constants.YearMonthPicker}{date.ToString(Constants.DateFormat)}"
-                )
+                InlineKeyboardButton.WithCallbackData($"{date.ToString("Y", dtfi)}", " ")
             };
         }
 
@@ -42,7 +39,7 @@ namespace TsiryulnyaBot.UIL.Utils
 
                 for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++)
                 {
-                    if ((weekNum == 0 && dayOfWeek < FirstDayOfWeek()) || dayOfMonth > lastDayOfMonth)
+                    if (weekNum == 0 && dayOfWeek < FirstDayOfWeek() || dayOfMonth > lastDayOfMonth)
                     {
                         week[dayOfWeek] = " ";
 
@@ -67,16 +64,6 @@ namespace TsiryulnyaBot.UIL.Utils
 
                 int FirstDayOfWeek() => (7 + (int)firstDayOfMonth.DayOfWeek - (int)dtfi.FirstDayOfWeek) % 7;
             }
-        }
-
-        public static IEnumerable<InlineKeyboardButton> Controls(in DateTime date)
-        {
-            return new InlineKeyboardButton[]
-            {
-                InlineKeyboardButton.WithCallbackData("<", $"{Constants.ChangeTo}{date.AddMonths(-1).ToString(Constants.DateFormat)}"),
-                " ",
-                InlineKeyboardButton.WithCallbackData(">", $"{Constants.ChangeTo}{date.AddMonths(1).ToString(Constants.DateFormat)}"),
-            };
         }
     }
 }

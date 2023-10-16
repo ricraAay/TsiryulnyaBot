@@ -4,7 +4,7 @@ using TsiryulnyaBot.BLL.Constant;
 using TsiryulnyaBot.BLL.Interface;
 using TsiryulnyaBot.BLL.Service;
 using TsiryulnyaBot.DAL.Model;
-using TsiryulnyaBot.UIL.Keyboard;
+using TsiryulnyaBot.Static.Keyboard;
 
 namespace TsiryulnyaBot.BLL.Scene
 {
@@ -48,14 +48,11 @@ namespace TsiryulnyaBot.BLL.Scene
 
                 foreach (var speclialist in _specialistService.GetAll())
                 {
-                    var message = botClient.SendTextMessageAsync(
+                    messages.Add(botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
                         text: _clientService.Get((Guid)speclialist.ClientId).Name,
-                        replyMarkup: SingleInlineKeyboardButton.Create("Выбрать", speclialist.Id.ToString()),
-                        cancellationToken: cancellationToken
-                    );
-
-                    messages.Add(message);
+                        replyMarkup: SingleInlineKeyboardButton.Create("Выбрать", speclialist.Id.ToString())
+                    ));
                 }
 
                 await Task.WhenAll(messages);
@@ -63,22 +60,25 @@ namespace TsiryulnyaBot.BLL.Scene
 
             if (update.CallbackQuery != null)
             {
-                var client = _clientService.Get(client => client.TlgId == update.CallbackQuery.From.Id).FirstOrDefault();
+                var client = _clientService.Get(update.CallbackQuery.From.Id);
                 var record = _recordClientService.Get(client);
 
-                _recordParameterClientService.Add(new RecordParameterClient()
+                if (Guid.TryParse(update.CallbackQuery.Data, out Guid specialistId))
                 {
-                    ParameterId = RecordParameterConstant.Specialist,
-                    RecordClientId = record.Id,
-                    UuidValue = new Guid(update.CallbackQuery.Data)
-                });
+                    _recordParameterClientService.Add(new RecordParameterClient()
+                    {
+                        ParameterId = RecordParameterConstant.Specialist,
+                        RecordClientId = record.Id,
+                        UuidValue = specialistId
+                    });
 
-                await botClient.SendTextMessageAsync(
-                    chatId: update.CallbackQuery.Message!.Chat.Id,
-                    text: "Подтвердите выбор специалиста",
-                    replyMarkup: SingleReplyKeyboardMarkup.Create("Продолжить"),
-                    cancellationToken: cancellationToken
-                );
+                    await botClient.SendTextMessageAsync(
+                        chatId: update.CallbackQuery.Message!.Chat.Id,
+                        text: "Подтвердите выбор специалиста",
+                        replyMarkup: SingleReplyKeyboardMarkup.Create("Продолжить"),
+                        cancellationToken: cancellationToken
+                    );
+                }
             }
         }
     }

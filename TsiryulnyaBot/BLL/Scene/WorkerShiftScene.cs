@@ -1,14 +1,11 @@
 ﻿using System.Globalization;
-using System.Threading;
-using System.Timers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TsiryulnyaBot.BLL.Constant;
 using TsiryulnyaBot.BLL.Interface;
 using TsiryulnyaBot.BLL.Service;
-using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
-using TsiryulnyaBot.UIL.Keyboard;
+using TsiryulnyaBot.Static.Keyboard;
 
 namespace TsiryulnyaBot.BLL.Scene
 {
@@ -69,9 +66,7 @@ namespace TsiryulnyaBot.BLL.Scene
 
             if (update.CallbackQuery != null)
             {
-                var data = update.CallbackQuery.Data;
-
-                if (DateOnly.TryParseExact(data, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date))
+                if (DateOnly.TryParseExact(update.CallbackQuery.Data, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date))
                 {
                     await botClient.SendTextMessageAsync(
                         chatId: update.CallbackQuery.Message!.Chat.Id,
@@ -80,7 +75,7 @@ namespace TsiryulnyaBot.BLL.Scene
                     );
                 }
 
-                if (Guid.TryParse(data, out Guid workerShiftId))
+                if (Guid.TryParse(update.CallbackQuery.Data, out Guid workerShiftId))
                 {
                     var recordParameterClientDateTime = _recordParameterClientService
                         .Aggregate(

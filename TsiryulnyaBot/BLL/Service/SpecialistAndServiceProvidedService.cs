@@ -13,7 +13,7 @@ namespace TsiryulnyaBot.BLL.Service
             _specialistAndServiceRepository = specialistAndServiceRepository;
         }
 
-        public IEnumerable<SpecialistAndService> GetWhere(Expression<Func<SpecialistAndService, bool>> predicate)
+        public IEnumerable<SpecialistAndService> Get(Expression<Func<SpecialistAndService, bool>> predicate)
         {
             return _specialistAndServiceRepository.Get(predicate).ToList();
         }

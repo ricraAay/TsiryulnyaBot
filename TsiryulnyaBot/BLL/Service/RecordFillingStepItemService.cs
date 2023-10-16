@@ -1,5 +1,4 @@
-﻿using TsiryulnyaBot.BLL.Interface;
-using TsiryulnyaBot.DAL.Interface;
+﻿using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
 
 namespace TsiryulnyaBot.BLL.Service

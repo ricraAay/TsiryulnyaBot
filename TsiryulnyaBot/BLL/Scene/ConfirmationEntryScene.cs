@@ -1,12 +1,9 @@
-﻿using System.Globalization;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TsiryulnyaBot.BLL.Constant;
 using TsiryulnyaBot.BLL.Interface;
 using TsiryulnyaBot.BLL.Service;
-using TsiryulnyaBot.DAL.Model;
-using TsiryulnyaBot.UIL.Keyboard;
 
 namespace TsiryulnyaBot.BLL.Scene
 {
@@ -46,7 +43,7 @@ namespace TsiryulnyaBot.BLL.Scene
 
             var client = _clientService.Get(update);
             var recordClient = _recordClientService.Get(client);
-            var recordParameters = _recordParameterClientService.Get(item => item.RecordClientId == recordClient.Id);;
+            var recordParameters = _recordParameterClientService.Get(item => item.RecordClientId == recordClient.Id);
 
             var specialist = _specialistService.Get((Guid)recordParameters.Where(item => item.ParameterId == RecordParameterConstant.Specialist).FirstOrDefault().UuidValue);
             var workerShip = _workerShiftService.Get((Guid)recordParameters.Where(item => item.ParameterId == RecordParameterConstant.DateTime).FirstOrDefault().UuidValue);

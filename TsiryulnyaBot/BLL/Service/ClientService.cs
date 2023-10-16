@@ -21,6 +21,10 @@ namespace TsiryulnyaBot.BLL.Service
                 ? update.Message.From 
                 : update.CallbackQuery.From;
 
+            var chat = update.Message != null
+                ? update.Message.Chat
+                : update.CallbackQuery.Message.Chat;
+
             var client = _clientRepository
                 .Get(client => client.TlgId == from.Id)
                 .FirstOrDefault();
@@ -34,7 +38,8 @@ namespace TsiryulnyaBot.BLL.Service
             {
                 Name = $"{from.FirstName} {from.LastName}".Trim(),
                 TlgUserName = from.Username,
-                TlgId = from.Id
+                TlgId = from.Id,
+                TlgChatId = chat.Id
             };
 
             _clientRepository.Add(client);
@@ -46,6 +51,11 @@ namespace TsiryulnyaBot.BLL.Service
         public Client Get(Guid id)
         {
             return _clientRepository.Get(id);
+        }
+
+        public Client Get(long tlgId) 
+        {
+            return _clientRepository.Get(item => item.TlgId == tlgId).Single();
         }
 
         public IEnumerable<Client> Get(Expression<Func<Client, bool>> predicate) 
