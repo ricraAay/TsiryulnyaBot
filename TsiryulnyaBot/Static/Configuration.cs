@@ -8,7 +8,7 @@ namespace TsiryulnyaBot.Static
 
         public static string Get(string key)
         {
-            if (_configurationBuilder !=  null) 
+            if (_configurationBuilder != null) 
             {
                 return _configurationBuilder[key];
             }
