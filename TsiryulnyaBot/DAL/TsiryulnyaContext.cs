@@ -32,7 +32,7 @@ public partial class TsiryulnyaContext : DbContext
 
     public virtual DbSet<RecordStatus> RecordStatuses { get; set; }
 
-    public virtual DbSet<Service> Services { get; set; }
+    public virtual DbSet<ServiceProvided> Services { get; set; }
 
     public virtual DbSet<Specialist> Specialists { get; set; }
 
@@ -86,6 +86,7 @@ public partial class TsiryulnyaContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("name");
             entity.Property(e => e.TlgId).HasColumnName("tlg_id");
+            entity.Property(e => e.TlgChatId).HasColumnName("tlg_chat_id");
             entity.Property(e => e.TlgUserName)
                 .HasMaxLength(250)
                 .HasColumnName("tlg_user_name");
@@ -140,6 +141,7 @@ public partial class TsiryulnyaContext : DbContext
             entity.Property(e => e.Passed).HasColumnName("passed");
             entity.Property(e => e.RecordId).HasColumnName("record_id");
             entity.Property(e => e.StepItemId).HasColumnName("step_item_id");
+            entity.Property(e => e.StepPosition).HasColumnName("step_position");
             entity.Property(e => e.UpdateAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("update_at");
@@ -259,7 +261,7 @@ public partial class TsiryulnyaContext : DbContext
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
         });
 
-        modelBuilder.Entity<Service>(entity =>
+        modelBuilder.Entity<ServiceProvided>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("service_pkey");
 
@@ -325,7 +327,7 @@ public partial class TsiryulnyaContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
-
+            entity.Property(e => e.Price).HasColumnName("price");
             entity.HasOne(d => d.Category).WithMany(p => p.SpecialistAndServices)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("specialist_and_service_category_id_fkey");
@@ -352,10 +354,10 @@ public partial class TsiryulnyaContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-            entity.Property(e => e.Date)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("date");
+            entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.SpecialistId).HasColumnName("specialist_id");
+            entity.Property(e => e.StatusId).HasColumnName("status_id");
+            entity.Property(e => e.Time).HasColumnName("time");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("updated_at");
@@ -364,6 +366,10 @@ public partial class TsiryulnyaContext : DbContext
             entity.HasOne(d => d.Specialist).WithMany(p => p.WorkerShifts)
                 .HasForeignKey(d => d.SpecialistId)
                 .HasConstraintName("worker_shift_specialist_id_fkey");
+
+            entity.HasOne(d => d.Status).WithMany(p => p.WorkerShifts)
+                .HasForeignKey(d => d.StatusId)
+                .HasConstraintName("worker_shift_status_id_fkey");
         });
 
         modelBuilder.Entity<WorkerShiftStatus>(entity =>

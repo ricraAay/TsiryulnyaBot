@@ -18,9 +18,11 @@
 
         public DateTime? UpdatedAt { get; set; }
 
+        public int? Price { get; set; }
+
         public virtual Category? Category { get; set; }
 
-        public virtual Service? Service { get; set; }
+        public virtual ServiceProvided? Service { get; set; }
 
         public virtual Specialist? Specialist { get; set; }
     }

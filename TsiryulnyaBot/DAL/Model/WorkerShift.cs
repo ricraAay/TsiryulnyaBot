@@ -1,21 +1,27 @@
 ﻿namespace TsiryulnyaBot.DAL.Model
 {
-    public class WorkerShift
+    public partial class WorkerShift
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
 
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; }
 
         public Guid? CreatedBy { get; set; }
 
         public Guid? UpdatedBy { get; set; }
 
-        public DateTime? Date { get; set; }
+        public DateOnly? Date { get; set; }
 
         public Guid? SpecialistId { get; set; }
 
-        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
+
+        public Guid? StatusId { get; set; }
+
+        public TimeOnly? Time { get; set; }
 
         public virtual Specialist? Specialist { get; set; }
+
+        public virtual WorkerShiftStatus? Status { get; set; }
     }
 }

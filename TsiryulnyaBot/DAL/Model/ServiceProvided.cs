@@ -3,7 +3,7 @@
     /// <summary>
     /// Справочник предостовляемых услуг
     /// </summary>
-    public class Service
+    public class ServiceProvided
     {
         /// <summary>
         /// Идентификатор услуги

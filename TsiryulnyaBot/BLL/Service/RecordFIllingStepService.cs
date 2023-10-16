@@ -1,15 +1,16 @@
-﻿using TsiryulnyaBot.DAL.Interface;
+﻿using Telegram.Bot.Types;
+using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
 
 namespace TsiryulnyaBot.BLL.Service
 {
-    public class RecordFIllingStepService
+    public class RecordFillingStepService
     {
         private readonly IRepository<RecordFillingStep> _recordFillingStepRepository;
 
         private readonly IRepository<RecordFillingStepItem> _recordFillingStepItemRepository;
 
-        public RecordFIllingStepService(
+        public RecordFillingStepService(
             IRepository<RecordFillingStep> recordFillingStepRepository, 
             IRepository<RecordFillingStepItem> recordFillingStepItemRepository)
         {
@@ -17,10 +18,10 @@ namespace TsiryulnyaBot.BLL.Service
             _recordFillingStepItemRepository = recordFillingStepItemRepository;
         }
 
-        public RecordFillingStep Get(RecordClient record)
+        public RecordFillingStep? Get(RecordClient record)
         {
             var recordFillingStep = _recordFillingStepRepository
-                .GetWhere(item => item.RecordId == record.Id)
+                .Get(item => item.RecordId == record.Id)
                 .OrderBy(item => item.StepPosition)
                 .FirstOrDefault(item => item.Passed == false);
 
@@ -31,7 +32,7 @@ namespace TsiryulnyaBot.BLL.Service
 
             foreach(var stepItem in _recordFillingStepItemRepository.GetAll())
             {
-                Add(new RecordFillingStep()
+                _recordFillingStepRepository.Add(new RecordFillingStep()
                 {
                     StepItemId = stepItem.Id,
                     Passed = false,
@@ -40,22 +41,18 @@ namespace TsiryulnyaBot.BLL.Service
                 });
             }
 
-            recordFillingStep = _recordFillingStepRepository
-                .GetWhere(item => item.RecordId == record.Id)
+            _recordFillingStepRepository.Commit();
+
+            return _recordFillingStepRepository
+                .Get(item => item.RecordId == record.Id)
                 .OrderBy(item => item.StepPosition)
                 .FirstOrDefault(item => item.Passed == false);
-
-            return recordFillingStep!;
-        }
-
-        public void Add(RecordFillingStep recordStep)
-        {
-            _recordFillingStepRepository.Add(recordStep);
         }
 
         public void Update(RecordFillingStep recordStep)
         {
             _recordFillingStepRepository.Update(recordStep);
+            _recordFillingStepRepository.Commit();
         }
     }
 }

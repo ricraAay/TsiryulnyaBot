@@ -39,6 +39,11 @@
         /// Идентификатор телеграмм
         /// </summary>
         public long? TlgId { get; set; }
+
+        /// <summary>
+        /// Идентификатор приватного чата
+        /// </summary>
+        public long? TlgChatId { get; set; }
         
         /// <summary>
         /// Дата изменения

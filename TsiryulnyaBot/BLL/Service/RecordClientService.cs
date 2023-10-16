@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using TsiryulnyaBot.BLL.Constant;
+using TsiryulnyaBot.BLL.Interface;
 using TsiryulnyaBot.DAL.Interface;
 using TsiryulnyaBot.DAL.Model;
 
@@ -8,36 +9,39 @@ namespace TsiryulnyaBot.BLL.Service
     {
         private readonly IRepository<RecordClient> _recordClientRepository;
 
-        private readonly IRepository<Client> _clientRepository;
-
-        public RecordClientService(
-            IRepository<RecordClient> recordClientRepository,
-            IRepository<Client> clientRepository) 
+        public RecordClientService(IRepository<RecordClient> recordClientRepository)        
         {
             _recordClientRepository = recordClientRepository;
-            _clientRepository = clientRepository;
         }
 
-        public RecordClient Get(Update update)
+        public RecordClient Get(Client client)
         {
-            var client = _clientRepository
-                .GetWhere(client => client.TlgId == update.Message!.From!.Id)
+            var recordClient = _recordClientRepository
+                .Get(record => record.ClientId == client!.Id)
+                .Where(record => record.StatusId == RecordStatusConstant.ProcessRegistration)
                 .FirstOrDefault();
 
-            var recordClient = _recordClientRepository
-                    .GetWhere(record => record.ClientId == client!.Id)
-                    .FirstOrDefault();  
-            
-            if (recordClient == null)
+            if (recordClient != null)
             {
-                recordClient = new RecordClient()
-                {
-                    ClientId = client!.Id,
-                    StatusId = new Guid("84a68145-6a1e-46e8-a83c-1e2eb636ffd3")
-                };
+                return recordClient;
             }
 
-            return recordClient;
+            recordClient = new RecordClient()
+            {
+                ClientId = client.Id,
+                StatusId = RecordStatusConstant.ProcessRegistration
+            };
+
+            _recordClientRepository.Add(recordClient);
+            _recordClientRepository.Commit();
+
+            return recordClient!;
+        }
+
+        public void Update(RecordClient recordClient)
+        {
+            _recordClientRepository.Update(recordClient);
+            _recordClientRepository.Commit();
         }
     }
 }

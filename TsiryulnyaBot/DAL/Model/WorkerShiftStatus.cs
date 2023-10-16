@@ -1,6 +1,6 @@
 ﻿namespace TsiryulnyaBot.DAL.Model
 {
-    public class WorkerShiftStatus
+    public partial class WorkerShiftStatus
     {
         public Guid Id { get; set; }
 
@@ -13,5 +13,7 @@
         public string? Name { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual ICollection<WorkerShift> WorkerShifts { get; set; } = new List<WorkerShift>();
     }
 }

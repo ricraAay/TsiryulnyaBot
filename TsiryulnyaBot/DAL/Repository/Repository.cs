@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TsiryulnyaBot.DAL.Interface;
 
 namespace TsiryulnyaBot.DAL.Repository
@@ -20,14 +21,21 @@ namespace TsiryulnyaBot.DAL.Repository
             return _dbSet.Find(id);
         }
 
+        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _dbSet.AsNoTracking().Where(predicate).ToList();
+        }
+
+        public IEnumerable<TEntity> Aggregate(params Expression<Func<TEntity, bool>>[] includeProperties)
+        {
+            return includeProperties
+                .Aggregate(_dbSet.AsNoTracking(), (current, includeProperty) => current.Where(includeProperty))
+                .ToList();
+        }
+
         public IEnumerable<TEntity> GetAll()
         {
             return _dbSet.ToList();
-        }
-
-        public IEnumerable<TEntity> GetWhere(Func<TEntity, bool> predicate)
-        {
-            return _dbSet.Where(predicate).ToList();
         }
 
         public void Add(TEntity entity)
@@ -43,6 +51,11 @@ namespace TsiryulnyaBot.DAL.Repository
         public void Delete(TEntity entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public int Commit()
+        {
+            return _context.SaveChanges();
         }
     }
 }
