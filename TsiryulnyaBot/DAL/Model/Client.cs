@@ -44,6 +44,12 @@
         /// Идентификатор приватного чата
         /// </summary>
         public long? TlgChatId { get; set; }
+
+
+        /// <summary>
+        /// Идентификатор картинки
+        /// </summary>
+        public string? TlgFileId { get; set; }
         
         /// <summary>
         /// Дата изменения

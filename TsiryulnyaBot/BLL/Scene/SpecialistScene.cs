@@ -48,9 +48,10 @@ namespace TsiryulnyaBot.BLL.Scene
 
                 foreach (var speclialist in _specialistService.GetAll())
                 {
-                    messages.Add(botClient.SendTextMessageAsync(
+                    messages.Add(botClient.SendPhotoAsync(
                         chatId: update.Message.Chat.Id,
-                        text: _clientService.Get((Guid)speclialist.ClientId).Name,
+                        photo: InputFile.FromFileId(_clientService.Get((Guid)speclialist.ClientId).TlgFileId),
+                        caption: _clientService.Get((Guid)speclialist.ClientId).Name,
                         replyMarkup: SingleInlineKeyboardButton.Create("Выбрать", speclialist.Id.ToString())
                     ));
                 }

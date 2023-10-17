@@ -44,15 +44,18 @@ namespace TsiryulnyaBot.BLL.Scene
             var client = _clientService.Get(update);
             var recordClient = _recordClientService.Get(client);
             var recordParameters = _recordParameterClientService.Get(item => item.RecordClientId == recordClient.Id);
+            var workerShiftFromParameter = recordParameters.Where(item => item.ParameterId == RecordParameterConstant.DateTime).FirstOrDefault();
+            var specialistFromParameter = recordParameters.Where(item => item.ParameterId == RecordParameterConstant.Specialist).FirstOrDefault();
 
-            var specialist = _specialistService.Get((Guid)recordParameters.Where(item => item.ParameterId == RecordParameterConstant.Specialist).FirstOrDefault().UuidValue);
-            var workerShip = _workerShiftService.Get((Guid)recordParameters.Where(item => item.ParameterId == RecordParameterConstant.DateTime).FirstOrDefault().UuidValue);
+            var specialist = _specialistService.Get((Guid)specialistFromParameter.UuidValue);
+            var workerShip = _workerShiftService.Get((Guid)workerShiftFromParameter.UuidValue);
+            var specialistFromClient = _clientService.Get((Guid)specialist.ClientId);
 
             recordClient.StatusId = RecordStatusConstant.Confirmed;
 
             _recordClientService.Update(recordClient);
 
-            messages.Add($"Вы записаны к мастеру {_clientService.Get(item => item.Id == specialist.ClientId).FirstOrDefault().Name}");
+            messages.Add($"Вы записаны к мастеру {specialistFromClient.Name}");
 
             foreach (var item in recordParameters.Where(item => item.ParameterId == RecordParameterConstant.Service))
             {
@@ -61,7 +64,11 @@ namespace TsiryulnyaBot.BLL.Scene
 
             messages.Add($"\nНа {workerShip.Date} в {workerShip.Time}, до встречи!");
 
-            // Добавить отправку уведомления специалисту
+            await botClient.SendTextMessageAsync(
+                chatId: _clientService.Get(specialistFromClient.Id).TlgChatId,
+                text: $"Клиент {client.Name}\n(@{client.TlgUserName})\nзаписан на {workerShip.Date} в {workerShip.Time}"
+            );
+
             await botClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: string.Join("\n", messages),

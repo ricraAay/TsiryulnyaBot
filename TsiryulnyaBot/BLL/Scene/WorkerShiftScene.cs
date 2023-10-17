@@ -41,7 +41,7 @@ namespace TsiryulnyaBot.BLL.Scene
             var recordClient = _recordClientService.Get(client);
             var recordParameterClientSpecialist = _recordParameterClientService
                 .Aggregate(item => item.RecordClientId == recordClient.Id, item => item.ParameterId == RecordParameterConstant.Specialist)
-                .Single();
+                .FirstOrDefault();
 
             var workerShift = _workerShiftService.Get(recordParameterClientSpecialist);
 

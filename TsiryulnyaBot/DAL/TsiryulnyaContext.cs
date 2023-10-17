@@ -86,7 +86,10 @@ public partial class TsiryulnyaContext : DbContext
                 .HasMaxLength(250)
                 .HasColumnName("name");
             entity.Property(e => e.TlgId).HasColumnName("tlg_id");
-            entity.Property(e => e.TlgChatId).HasColumnName("tlg_chat_id");
+            entity.Property(e => e.TlgChatId).HasColumnName("tlg_chat_id"); 
+            entity.Property(e => e.TlgFileId)
+                .HasMaxLength(250)
+                .HasColumnName("tlg_file_id");
             entity.Property(e => e.TlgUserName)
                 .HasMaxLength(250)
                 .HasColumnName("tlg_user_name");

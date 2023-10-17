@@ -11,18 +11,16 @@ namespace TsiryulnyaBot
         async static Task Main(string[] args)
         {
             var botClient = new TelegramBotClient(Configuration.Get("BotToken"));
-
-            var botInfo = await botClient.GetMeAsync();
-
-            Console.WriteLine($"Start bot\nID: {botInfo.Id}\nNAME: {botInfo.FirstName}.");
-
-
             var commands = new List<BotCommand>()
             {
-                new BotCommand { Command = "/start", Description = "запустить/перезапустить бота" }
+                new BotCommand { Command = "/start", Description = "Новая запись/продолжить" }
             };
 
             await botClient.SetMyCommandsAsync(commands);
+
+            var botInfo = await botClient.GetMeAsync();
+
+            Console.WriteLine($"Start bot - {botInfo.FirstName}");
 
             using CancellationTokenSource cts = new();
 
@@ -47,7 +45,7 @@ namespace TsiryulnyaBot
                 connectionString: Configuration.Get("ConnectionString")
             );
 
-            await Task.Run(async () => await controller.Execute(update, cancellationToken));
+            Task.Run(async () => await controller.Execute(update, cancellationToken));
         }
 
         static public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

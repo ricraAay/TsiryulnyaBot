@@ -11,7 +11,8 @@ namespace TsiryulnyaBot.Static.Keyboard
                 new KeyboardButton[] { text },
             })
             {
-                ResizeKeyboard = true
+                ResizeKeyboard = true,
+                OneTimeKeyboard = true
             };
         }
     }

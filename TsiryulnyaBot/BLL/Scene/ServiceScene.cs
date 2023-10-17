@@ -44,6 +44,21 @@ namespace TsiryulnyaBot.BLL.Scene
 
         public async Task Execute(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            var from = update.Message != null
+                ? update.Message.From 
+                : update.CallbackQuery.From;
+
+            var client = _clientService.Get(from.Id);
+
+            var recordClient = _recordClientService.Get(client);
+
+            var specialistFromRecordParameter = _recordParameterClientService
+                .Aggregate(item => item.RecordClientId == recordClient.Id, item => item.ParameterId == RecordParameterConstant.Specialist)
+                .FirstOrDefault();
+
+            var servicesFromRecordParameter = _recordParameterClientService
+                .Aggregate(item => item.RecordClientId == recordClient.Id, item => item.ParameterId == RecordParameterConstant.Service);
+
             if (update.Message != null)
             {
                 if (update?.Message.Text == "Продолжить")
@@ -52,20 +67,9 @@ namespace TsiryulnyaBot.BLL.Scene
                     return;
                 }
 
-                // Клиент
-                var client = _clientService.Get(update.Message.From.Id);
-                // Текущая запись
-                var recordClient = _recordClientService.Get(client);
-                // Парметр записи "Специалист"
-                var recordParameter = _recordParameterClientService
-                    .Aggregate(
-                        item => item.RecordClientId == recordClient.Id,
-                        item => item.ParameterId == RecordParameterConstant.Specialist)
-                    .FirstOrDefault();
-
                 var messages = new List<Task<Message>>();
 
-                foreach (var item in _specialistAndServiceProvidedService.Get(item => item.SpecialistId == recordParameter!.UuidValue))
+                foreach (var item in _specialistAndServiceProvidedService.Get(item => item.SpecialistId == specialistFromRecordParameter!.UuidValue))
                 {
                     var id = item.Id;
                     var price = item.Price;
@@ -73,11 +77,14 @@ namespace TsiryulnyaBot.BLL.Scene
                     var category = _categoryService.Get((Guid)item.CategoryId).Name;
 
                     var textMessage = string.Format("{0}\n({1})\n{2} руб.", service, category.ToLower(), price);
+                    var replyMarkup = servicesFromRecordParameter.Select(item => item.UuidValue).Contains(item.ServiceId)
+                        ? SingleInlineKeyboardButton.Create("Отменить", $"{item.ServiceId}")
+                        : SingleInlineKeyboardButton.Create("Выбрать", $"{item.ServiceId}");
 
                     var message = botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat.Id,
                         text: textMessage,
-                        replyMarkup: SingleInlineKeyboardButton.Create("Выбрать", item.ServiceId.ToString())
+                        replyMarkup: replyMarkup
                     );
 
                     messages.Add(message);
@@ -92,6 +99,19 @@ namespace TsiryulnyaBot.BLL.Scene
 
                 if (Guid.TryParse(update.CallbackQuery.Data, out Guid serviceId))
                 {
+                    if (servicesFromRecordParameter.Select(item => item.UuidValue).Contains(serviceId))
+                    {
+                        _recordParameterClientService.Delete(servicesFromRecordParameter.Where(item => item.UuidValue == serviceId).FirstOrDefault());
+
+                        await botClient.EditMessageReplyMarkupAsync(
+                            chatId: update.CallbackQuery.Message.Chat.Id,
+                            messageId: update.CallbackQuery.Message.MessageId,
+                            replyMarkup: SingleInlineKeyboardButton.Create("Выбрать", $"{serviceId}")
+                        );
+
+                        return;
+                    }
+
                     _recordParameterClientService.Add(new RecordParameterClient()
                     {
                         ParameterId = RecordParameterConstant.Service,
@@ -105,7 +125,13 @@ namespace TsiryulnyaBot.BLL.Scene
                             item => item.ParameterId == RecordParameterConstant.Service)
                         .Count();
 
-                    if (recordParameterClientCount == 0)
+                    await botClient.EditMessageReplyMarkupAsync(
+                        chatId: update.CallbackQuery.Message.Chat.Id,
+                        messageId: update.CallbackQuery.Message.MessageId,
+                        replyMarkup: SingleInlineKeyboardButton.Create("Отменить", $"{serviceId}")
+                    );
+
+                    if (recordParameterClientCount == 1)
                     {
                         await botClient.SendTextMessageAsync(
                             chatId: update.CallbackQuery.Message.Chat.Id,

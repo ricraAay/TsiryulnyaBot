@@ -4,7 +4,6 @@ using TsiryulnyaBot.BLL.Service;
 using TsiryulnyaBot.DAL;
 using TsiryulnyaBot.DAL.Model;
 using TsiryulnyaBot.DAL.Repository;
-using Microsoft.Extensions.Configuration;
 using TsiryulnyaBot.BLL.Scene;
 using TsiryulnyaBot.BLL.Interface;
 
@@ -42,7 +41,7 @@ namespace TsiryulnyaBot.BLL
                 var recordFillingStepService = new RecordFillingStepService(recordFillingStepRepository, recordFillingStepItemRepository);
                 var specialistService = new SpecialistService(specialistRepository);
                 var recordParameterClientService = new RecordParameterClientService(recordParameterClientRepository);
-                var specialistAndServiceService = new SpecialistAndServiceProvidedService(specialistAndServiceRepository);
+                var specialistAndServiceProvidedService = new SpecialistAndServiceProvidedService(specialistAndServiceRepository);
                 var categoryService = new CategoryService(categoryRepository);
                 var serviceProvidedService = new ServiceProvidedService(serviveProvidedRepository);
                 var workerShiftService = new WorkerShiftService(workerShiftRepository);
@@ -59,7 +58,7 @@ namespace TsiryulnyaBot.BLL
                 );
 
                 var serviceScene = new ServiceScene(
-                    specialistAndServiceService: specialistAndServiceService,
+                    specialistAndServiceService: specialistAndServiceProvidedService,
                     recordParameterClientService: recordParameterClientService,
                     clientService: clientService,
                     recordClientService: recordClientService,
